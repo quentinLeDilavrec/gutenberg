@@ -39,6 +39,14 @@ export const INSERTER_UTILITY_MEDIUM = 2;
 export const INSERTER_UTILITY_LOW = 1;
 export const INSERTER_UTILITY_NONE = 0;
 const ONE_MINUTE_IN_MS = 60 * 1000;
+
+/**
+ * Shared reference to an empty object for cases where it is important to avoid
+ * returning a new object reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ */
 const EMPTY_OBJECT = {};
 
 /**
