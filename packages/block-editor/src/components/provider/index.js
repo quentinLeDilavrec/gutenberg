@@ -38,7 +38,7 @@ const withRegistry = createHigherOrderComponent(
  *
  * @return {boolean} Whether the two objects have the same keys.
  */
-function hasSameKeys( a, b ) {
+export function hasSameKeys( a, b ) {
 	return isShallowEqual( Object.keys( a ), Object.keys( b ) );
 }
 
@@ -52,7 +52,7 @@ function hasSameKeys( a, b ) {
  *
  * @return {boolean} Whether actions are updating the same block attribute.
  */
-function isUpdatingSameBlockAttribute( action, lastAction ) {
+export function isUpdatingSameBlockAttribute( action, lastAction ) {
 	return (
 		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
 		action.clientId === lastAction.clientId &&
@@ -86,7 +86,7 @@ function createChangeObserver( store, callback ) {
 			isPendingCommit = false;
 		} else if ( lastAction && lastState && state !== lastState ) {
 			if (
-				state.editor.blocks !== lastState.editor.blocks &&
+				state.blocks !== lastState.blocks &&
 				isUpdatingSameBlockAttribute( action, lastAction )
 			) {
 				// So long as block updates occur as operating on the same
