@@ -159,7 +159,7 @@ describe( 'state', () => {
 
 	describe( 'editor()', () => {
 		describe( 'blocks()', () => {
-			it( 'should set its value by RESET_BLOCKS', () => {
+			it( 'should set its value by RESET_EDITOR_BLOCKS', () => {
 				const blocks = [ {
 					clientId: 'block3',
 					innerBlocks: [
@@ -168,7 +168,7 @@ describe( 'state', () => {
 					],
 				} ];
 				const state = editor( undefined, {
-					type: 'RESET_BLOCKS',
+					type: 'RESET_EDITOR_BLOCKS',
 					blocks,
 				} );
 
@@ -343,7 +343,7 @@ describe( 'state', () => {
 				expect( state.present.edits ).toHaveProperty( 'content' );
 
 				state = editor( original, {
-					type: 'RESET_BLOCKS',
+					type: 'RESET_EDITOR_BLOCKS',
 					blocks: [ {
 						clientId: 'kumquat',
 						name: 'core/test-block',

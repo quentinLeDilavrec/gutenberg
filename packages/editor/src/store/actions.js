@@ -350,7 +350,7 @@ export function unlockPostSaving( lockName ) {
  */
 export function resetEditorBlocks( blocks ) {
 	return {
-		type: 'RESET_BLOCKS',
+		type: 'RESET_EDITOR_BLOCKS',
 		blocks,
 	};
 }

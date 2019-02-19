@@ -136,7 +136,7 @@ export const editor = flow( [
 
 			// Blocks history is managed by explicit createUndoLevel actions
 			// occurring via the rendered BlockEditor's onChange callback.
-			'RESET_BLOCKS',
+			'RESET_EDITOR_BLOCKS',
 		],
 		shouldOverwriteState,
 	} ),
@@ -147,7 +147,7 @@ export const editor = flow( [
 		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
 	} )( ( state = { value: [] }, action ) => {
 		switch ( action.type ) {
-			case 'RESET_BLOCKS':
+			case 'RESET_EDITOR_BLOCKS':
 				return { value: action.blocks };
 		}
 
@@ -187,7 +187,7 @@ export const editor = flow( [
 					delete result[ key ];
 					return result;
 				}, state );
-			case 'RESET_BLOCKS':
+			case 'RESET_EDITOR_BLOCKS':
 				if ( 'content' in state ) {
 					return omit( state, 'content' );
 				}
