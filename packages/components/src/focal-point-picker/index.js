@@ -21,24 +21,19 @@ const TEXTCONTROL_MIN = 0;
 const TEXTCONTROL_MAX = 100;
 
 export class FocalPointPicker extends Component {
-	constructor() {
-		super( ...arguments );
+	constructor( props ) {
+		super( props );
 		this.onMouseMove = this.onMouseMove.bind( this );
 		this.state = {
 			isDragging: false,
 			bounds: {},
-			percentages: {},
+			percentages: props.value,
 		};
 		this.containerRef = createRef();
 		this.imageRef = createRef();
 		this.horizontalPositionChanged = this.horizontalPositionChanged.bind( this );
 		this.verticalPositionChanged = this.verticalPositionChanged.bind( this );
 		this.onLoad = this.onLoad.bind( this );
-	}
-	componentDidMount() {
-		this.setState( {
-			percentages: this.props.value,
-		} );
 	}
 	componentDidUpdate( prevProps ) {
 		if ( prevProps.url !== this.props.url ) {
@@ -178,7 +173,7 @@ export class FocalPointPicker extends Component {
 		);
 		const id = `inspector-focal-point-picker-control-${ instanceId }`;
 		const horizontalPositionId = `inspector-focal-point-picker-control-horizontal-position-${ instanceId }`;
-		const verticalPositionId = `inspector-focal-point-picker-control-horizontal-position-${ instanceId }`;
+		const verticalPositionId = `inspector-focal-point-picker-control-vertical-position-${ instanceId }`;
 		return (
 			<BaseControl label={ label } id={ id } help={ help } className={ className }>
 				<div className="components-focal-point-picker-wrapper">
@@ -209,7 +204,7 @@ export class FocalPointPicker extends Component {
 					</div>
 				</div>
 				<div className="components-focal-point-picker_position-display-container">
-					<BaseControl label={ __( 'Horizontal Pos.' ) }>
+					<BaseControl label={ __( 'Horizontal Pos.' ) } id={ horizontalPositionId }>
 						<input
 							className="components-text-control__input"
 							id={ horizontalPositionId }
@@ -221,7 +216,7 @@ export class FocalPointPicker extends Component {
 						/>
 						<span>%</span>
 					</BaseControl>
-					<BaseControl label={ __( 'Vertical Pos.' ) }>
+					<BaseControl label={ __( 'Vertical Pos.' ) } id={ verticalPositionId }>
 						<input
 							className="components-text-control__input"
 							id={ verticalPositionId }

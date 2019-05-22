@@ -7,9 +7,9 @@ import { find } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSpokenMessages } from '@wordpress/components';
-import { RichTextToolbarButton } from '@wordpress/editor';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	applyFormat,
 	getActiveFormat,
@@ -106,18 +106,16 @@ export const link = {
 			const linkSelection = this.getLinkSelection();
 
 			return (
-				<Fragment>
-					{ this.state.addingLink &&
-						<ModalLinkUI
-							isVisible
-							isActive={ isActive }
-							activeAttributes={ activeAttributes }
-							onClose={ this.stopAddingLink }
-							onChange={ onChange }
-							onRemove={ this.onRemoveFormat }
-							value={ linkSelection }
-						/>
-					}
+				<>
+					<ModalLinkUI
+						isVisible={ this.state.addingLink }
+						isActive={ isActive }
+						activeAttributes={ activeAttributes }
+						onClose={ this.stopAddingLink }
+						onChange={ onChange }
+						onRemove={ this.onRemoveFormat }
+						value={ linkSelection }
+					/>
 					<RichTextToolbarButton
 						name="link"
 						icon="admin-links"
@@ -127,7 +125,7 @@ export const link = {
 						shortcutType="primary"
 						shortcutCharacter="k"
 					/>
-				</Fragment>
+				</>
 			);
 		}
 	} ),

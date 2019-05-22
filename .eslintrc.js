@@ -23,6 +23,7 @@ module.exports = {
 		'plugin:jest/recommended',
 	],
 	rules: {
+		'@wordpress/react-no-unsafe-timeout': 'error',
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or
@@ -35,35 +36,6 @@ module.exports = {
 			{
 				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',
 				message: 'Deprecated functions must be removed before releasing this version.',
-			},
-			{
-				// Builds a selector which handles CallExpression with path
-				// argument at varied position by function.
-				//
-				// See: https://github.com/WordPress/gutenberg/pull/9615
-				selector: map( {
-					1: [
-						'property',
-						'matchesProperty',
-						'path',
-					],
-					2: [
-						'invokeMap',
-						'get',
-						'has',
-						'hasIn',
-						'invoke',
-						'result',
-						'set',
-						'setWith',
-						'unset',
-						'update',
-						'updateWith',
-					],
-				}, ( functionNames, argPosition ) => (
-					`CallExpression[callee.name=/^(${ functionNames.join( '|' ) })$/] > Literal:nth-child(${ argPosition })`
-				) ).join( ',' ),
-				message: 'Always pass an array as the path argument',
 			},
 			{
 				selector: 'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
@@ -91,6 +63,10 @@ module.exports = {
 			{
 				selector: 'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
 				message: 'withDispatch must return an object with consistent keys. Avoid performing logic in `mapDispatchToProps`.',
+			},
+			{
+				selector: 'LogicalExpression[operator="&&"][left.property.name="length"][right.type="JSXElement"]',
+				message: 'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
 			},
 		],
 		'react/forbid-elements': [ 'error', {

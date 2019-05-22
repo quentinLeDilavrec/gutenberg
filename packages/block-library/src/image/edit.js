@@ -20,14 +20,18 @@ import {
 	ButtonGroup,
 	IconButton,
 	PanelBody,
+	Path,
+	Rect,
 	ResizableBox,
 	SelectControl,
 	Spinner,
+	SVG,
 	TextareaControl,
 	TextControl,
 	ToggleControl,
 	Toolbar,
 	withNotices,
+	ExternalLink,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -37,15 +41,14 @@ import {
 	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
-	MediaUpload,
-	MediaUploadCheck,
 	RichText,
-	mediaUpload,
-} from '@wordpress/editor';
-import { Component, Fragment } from '@wordpress/element';
+} from '@wordpress/block-editor';
+import { mediaUpload } from '@wordpress/editor';
+import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -328,6 +331,11 @@ class ImageEdit extends Component {
 		this.setState( {
 			isEditing: ! this.state.isEditing,
 		} );
+		if ( this.state.isEditing ) {
+			speak( __( 'You are now viewing the image in the image block.' ) );
+		} else {
+			speak( __( 'You are now editing the image in the image block.' ) );
+		}
 	}
 
 	getImageSizeOptions() {
@@ -372,70 +380,61 @@ class ImageEdit extends Component {
 			linkTarget,
 		} = attributes;
 		const isExternal = isExternalImage( id, url );
-
-		let toolbarEditButton;
-		if ( url ) {
-			if ( isExternal ) {
-				toolbarEditButton = (
-					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit image' ) }
-							onClick={ this.toggleIsEditing }
-							icon="edit"
-						/>
-					</Toolbar>
-				);
-			} else {
-				toolbarEditButton = (
-					<MediaUploadCheck>
-						<Toolbar>
-							<MediaUpload
-								onSelect={ this.onSelectImage }
-								allowedTypes={ ALLOWED_MEDIA_TYPES }
-								value={ id }
-								render={ ( { open } ) => (
-									<IconButton
-										className="components-toolbar__control"
-										label={ __( 'Edit image' ) }
-										icon="edit"
-										onClick={ open }
-									/>
-								) }
-							/>
-						</Toolbar>
-					</MediaUploadCheck>
-				);
-			}
-		}
-
+		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 		const controls = (
 			<BlockControls>
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ this.updateAlignment }
 				/>
-				{ toolbarEditButton }
+				{ url && (
+					<Toolbar>
+						<IconButton
+							className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
+							label={ __( 'Edit image' ) }
+							aria-pressed={ this.state.isEditing }
+							onClick={ this.toggleIsEditing }
+							icon={ editImageIcon }
+						/>
+					</Toolbar>
+				) }
 			</BlockControls>
 		);
-
+		const src = isExternal ? url : undefined;
+		const labels = {
+			title: ! url ? __( 'Image' ) : __( 'Edit image' ),
+			instructions: __( 'Drag an image to upload, select a file from your library or add one from an URL.' ),
+		};
+		const mediaPreview = ( !! url && <img
+			alt={ __( 'Edit image' ) }
+			title={ __( 'Edit image' ) }
+			className={ 'edit-image-preview' }
+			src={ url }
+		/> );
+		const mediaPlaceholder = (
+			<MediaPlaceholder
+				icon={ <BlockIcon icon={ icon } /> }
+				className={ className }
+				labels={ labels }
+				onSelect={ this.onSelectImage }
+				onSelectURL={ this.onSelectURL }
+				onDoubleClick={ this.toggleIsEditing }
+				onCancel={ !! url && this.toggleIsEditing }
+				notices={ noticeUI }
+				onError={ this.onUploadError }
+				accept="image/*"
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				value={ { id, src } }
+				mediaPreview={ mediaPreview }
+				dropZoneUIOnly={ ! isEditing && url }
+			/>
+		);
 		if ( isEditing || ! url ) {
-			const src = isExternal ? url : undefined;
 			return (
-				<Fragment>
+				<>
 					{ controls }
-					<MediaPlaceholder
-						icon={ <BlockIcon icon={ icon } /> }
-						className={ className }
-						onSelect={ this.onSelectImage }
-						onSelectURL={ this.onSelectURL }
-						notices={ noticeUI }
-						onError={ this.onUploadError }
-						accept="image/*"
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ { id, src } }
-					/>
-				</Fragment>
+					{ mediaPlaceholder }
+				</>
 			);
 		}
 
@@ -456,7 +455,14 @@ class ImageEdit extends Component {
 						label={ __( 'Alt Text (Alternative Text)' ) }
 						value={ alt }
 						onChange={ this.updateAlt }
-						help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
+						help={
+							<>
+								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+									{ __( 'Describe the purpose of the image' ) }
+								</ExternalLink>
+								{ __( 'Leave empty if the image is purely decorative.' ) }
+							</>
+						}
 					/>
 					{ ! isEmpty( imageSizeOptions ) && (
 						<SelectControl
@@ -476,7 +482,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__width"
 									label={ __( 'Width' ) }
-									value={ width !== undefined ? width : imageWidth }
+									value={ width || imageWidth || '' }
 									min={ 1 }
 									onChange={ this.updateWidth }
 								/>
@@ -484,7 +490,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__height"
 									label={ __( 'Height' ) }
-									value={ height !== undefined ? height : imageHeight }
+									value={ height || imageHeight || '' }
 									min={ 1 }
 									onChange={ this.updateHeight }
 								/>
@@ -528,7 +534,7 @@ class ImageEdit extends Component {
 						onChange={ this.onSetLinkDestination }
 					/>
 					{ linkDestination !== LINK_DESTINATION_NONE && (
-						<Fragment>
+						<>
 							<TextControl
 								label={ __( 'Link URL' ) }
 								value={ href || '' }
@@ -550,7 +556,7 @@ class ImageEdit extends Component {
 								value={ rel || '' }
 								onChange={ this.onSetLinkRel }
 							/>
-						</Fragment>
+						</>
 					) }
 				</PanelBody>
 			</InspectorControls>
@@ -559,7 +565,7 @@ class ImageEdit extends Component {
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<Fragment>
+			<>
 				{ controls }
 				<figure className={ classes }>
 					<ImageSize src={ url } dirtynessTrigger={ align }>
@@ -585,21 +591,27 @@ class ImageEdit extends Component {
 								// Disable reason: Image itself is not meant to be interactive, but
 								// should direct focus to block.
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-								<Fragment>
-									<img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } onError={ () => this.onImageError( url ) } />
+								<>
+									<img
+										src={ url }
+										alt={ defaultedAlt }
+										onDoubleClick={ this.toggleIsEditing }
+										onClick={ this.onImageClick }
+										onError={ () => this.onImageError( url ) }
+									/>
 									{ isBlobURL( url ) && <Spinner /> }
-								</Fragment>
+								</>
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 							);
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
-									<Fragment>
+									<>
 										{ getInspectorControls( imageWidth, imageHeight ) }
 										<div style={ { width, height } }>
 											{ img }
 										</div>
-									</Fragment>
+									</>
 								);
 							}
 
@@ -647,7 +659,7 @@ class ImageEdit extends Component {
 							/* eslint-enable no-lonely-if */
 
 							return (
-								<Fragment>
+								<>
 									{ getInspectorControls( imageWidth, imageHeight ) }
 									<ResizableBox
 										size={
@@ -680,7 +692,7 @@ class ImageEdit extends Component {
 									>
 										{ img }
 									</ResizableBox>
-								</Fragment>
+								</>
 							);
 						} }
 					</ImageSize>
@@ -696,7 +708,8 @@ class ImageEdit extends Component {
 						/>
 					) }
 				</figure>
-			</Fragment>
+				{ mediaPlaceholder }
+			</>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
@@ -705,9 +718,9 @@ class ImageEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
-		const { getEditorSettings } = select( 'core/editor' );
+		const { getSettings } = select( 'core/block-editor' );
 		const { id } = props.attributes;
-		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
+		const { maxWidth, isRTL, imageSizes } = getSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,

@@ -29,7 +29,7 @@ When creating a new package, you need to provide at least the following:
 		"module": "build-module/index.js",
 		"react-native": "src/index",
 		"dependencies": {
-			"@babel/runtime": "^7.0.0"
+			"@babel/runtime": "^7.4.4"
 		},
 		"publishConfig": {
 			"access": "public"
@@ -124,5 +124,5 @@ NPM_CONFIG_OTP=123456 npm run publish:prod
 
 Choose the correct version based on `CHANGELOG.md` files, confirm your choices and let Lerna do its magic.
 
-[lerna]: https://lernajs.io/
+[lerna]: https://lerna.js.org/
 [npm]: https://www.npmjs.com/
