@@ -19,7 +19,7 @@ if ( ! process.env.SKIP_JSX_PRAGMA_TRANSFORM ) {
 	} ] );
 }
 
-plugins.push( '/home/quentin/gutenberg/bin/packages/my_transformer.js' );
+plugins.push( '/home/quentin/gutenberg/bin/packages/instrument_transformer.js' );
 
 const overrideOptions = ( target, targetName, options ) => {
 	if ( get( target, [ 'file', 'request' ] ) === targetName ) {
