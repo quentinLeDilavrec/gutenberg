@@ -8,6 +8,8 @@ const { escapeRegExp, map } = require( 'lodash' );
  */
 const { version } = require( './package' );
 
+debugger;
+
 /**
  * Regular expression string matching a SemVer string with equal major/minor to
  * the current package version. Used in identifying deprecations.
@@ -22,8 +24,12 @@ module.exports = {
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:jest/recommended',
 	],
+	// plugins: [
+	// 	'@wordpress/eslint-plugin-instrument',
+	// ],
 	rules: {
 		'@wordpress/react-no-unsafe-timeout': 'error',
+		// '@wordpress/behaviour-analysis': 2,
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or

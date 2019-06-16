@@ -32,10 +32,15 @@ fi
 # Get the host port for the WordPress container.
 HOST_PORT=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS port $CONTAINER 80 | awk -F : '{printf $2}')
 
+# TODO show were the error was
+WPADDR='http://'
+WPADDR+=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS port $CONTAINER 80) #"http://localhost:$HOST_PORT"
+
 # Wait until the Docker containers are running and the WordPress site is
 # responding to requests.
+echo $WPADDR
 echo -en $(status_message "Attempting to connect to WordPress...")
-until $(curl -L http://localhost:$HOST_PORT -so - 2>&1 | grep -q "WordPress"); do
+until $(curl -L $WPADDR -so - 2>&1 | grep -q "WordPress"); do
     echo -n '.'
     sleep 5
 done
@@ -52,7 +57,7 @@ fi
 echo -e $(status_message "Installing WordPress...")
 # The `-u 33` flag tells Docker to run the command as a particular user and
 # prevents permissions errors. See: https://github.com/WordPress/gutenberg/pull/8427#issuecomment-410232369
-docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI core install --title="$SITE_TITLE" --admin_user=admin --admin_password=password --admin_email=test@test.com --skip-email --url=http://localhost:$HOST_PORT --quiet
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI core install --title="$SITE_TITLE" --admin_user=admin --admin_password=password --admin_email=test@test.com --skip-email --url=$WPADDR --quiet
 
 if [ "$E2E_ROLE" = "author" ]; then
 	echo -e $(status_message "Creating an additional author user for testing...")
@@ -81,9 +86,9 @@ fi
 # If the 'wordpress' volume wasn't during the down/up earlier, but the post port has changed, we need to update it.
 echo -e $(status_message "Checking the site's url...")
 CURRENT_URL=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm $CLI option get siteurl)
-if [ "$CURRENT_URL" != "http://localhost:$HOST_PORT" ]; then
-	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI option update home "http://localhost:$HOST_PORT" --quiet
-	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI option update siteurl "http://localhost:$HOST_PORT" --quiet
+if [ "$CURRENT_URL" != "$WPADDR" ]; then
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI option update home "$WPADDR" --quiet
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI option update siteurl "$WPADDR" --quiet
 fi
 
 # Activate Gutenberg.

@@ -7,9 +7,9 @@ const path = require( 'path' );
  * Internal dependencies
  */
 const { hasBabelConfig } = require( '../utils' );
-
 const jestUnitConfig = {
 	preset: '@wordpress/jest-preset-default',
+	// setupFile: './global-setup.js',
 };
 
 if ( ! hasBabelConfig() ) {

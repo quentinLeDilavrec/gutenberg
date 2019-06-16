@@ -17,6 +17,7 @@ const mkdirp = require( 'mkdirp' );
 const sass = require( 'node-sass' );
 const postcss = require( 'postcss' );
 const deasync = require( 'deasync' );
+const util = require( 'util' );
 
 /**
  * Internal dependencies
@@ -165,20 +166,23 @@ function buildJsFileFor( file, silent, environment ) {
 	const buildDir = BUILD_DIR[ environment ];
 	const destPath = getBuildPath( file, buildDir );
 	const babelOptions = getBabelConfig( environment, file.replace( PACKAGES_DIR, '@wordpress' ) );
-
+	fs.appendFileSync( './files2.csv', util.inspect( babelOptions ) + '\n' );
+	if ( ! file.includes( '/src/' ) ) {
+		throw file;
+	}
 	mkdirp.sync( path.dirname( destPath ) );
 	const transformed = babel.transformFileSync( file, babelOptions );
 	fs.writeFileSync( destPath + '.map', JSON.stringify( transformed.map ) );
 	fs.writeFileSync( destPath, transformed.code + '\n//# sourceMappingURL=' + path.basename( destPath ) + '.map' );
 
 	if ( ! silent ) {
-		process.stdout.write(
-			chalk.green( '  \u2022 ' ) +
-				path.relative( PACKAGES_DIR, file ) +
-				chalk.green( ' \u21D2 ' ) +
-				path.relative( PACKAGES_DIR, destPath ) +
-				'\n'
-		);
+		// process.stdout.write(
+		// 	chalk.green( '  \u2022 ' ) +
+		// 		path.relative( PACKAGES_DIR, file ) +
+		// 		chalk.green( ' \u21D2 ' ) +
+		// 		path.relative( PACKAGES_DIR, destPath ) +
+		// 		'\n'
+		// );
 	}
 }
 
@@ -200,7 +204,7 @@ function buildPackage( packagePath ) {
 	process.stdout.write( `${ path.basename( packagePath ) }\n` );
 
 	// Build js files individually.
-	jsFiles.forEach( ( file ) => buildJsFile( file, true ) );
+	jsFiles.forEach( ( file ) => buildJsFile( file, false ) );
 
 	// Build package CSS files
 	buildPackageScss( packagePath );

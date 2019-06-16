@@ -60,7 +60,11 @@ Array [
 
 exports[`Webpack \`no-default\` should produce expected output: Dependencies JSON should match snapshot 1`] = `Array []`;
 
+exports[`Webpack \`no-default\` should produce expected output: Dependencies JSON should match snapshot 2`] = `Array []`;
+
 exports[`Webpack \`no-default\` should produce expected output: External modules should match snapshot 1`] = `Array []`;
+
+exports[`Webpack \`no-default\` should produce expected output: External modules should match snapshot 2`] = `Array []`;
 
 exports[`Webpack \`no-deps\` should produce expected output: Dependencies JSON should match snapshot 1`] = `Array []`;
 

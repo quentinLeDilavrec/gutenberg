@@ -14,6 +14,7 @@
 		"GUTENBERG_PHASE": 2
 	},
 	"dependencies": {
+		"@jest/environment": "24.8.0",
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/annotations": "file:packages/annotations",
 		"@wordpress/api-fetch": "file:packages/api-fetch",
@@ -55,7 +56,9 @@
 		"@wordpress/token-list": "file:packages/token-list",
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
-		"@wordpress/wordcount": "file:packages/wordcount"
+		"@wordpress/wordcount": "file:packages/wordcount",
+		"ajv": "6.10.0",
+		"puppeteer": "1.17.0"
 	},
 	"devDependencies": {
 		"@babel/core": "7.4.4",
@@ -72,6 +75,7 @@
 		"@wordpress/e2e-test-utils": "file:packages/e2e-test-utils",
 		"@wordpress/e2e-tests": "file:packages/e2e-tests",
 		"@wordpress/eslint-plugin": "file:packages/eslint-plugin",
+		"@wordpress/eslint-plugin-instrument": "file:packages/eslint-plugin-instrument",
 		"@wordpress/jest-console": "file:packages/jest-console",
 		"@wordpress/jest-preset-default": "file:packages/jest-preset-default",
 		"@wordpress/jest-puppeteer-axe": "file:packages/jest-puppeteer-axe",
@@ -80,6 +84,7 @@
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/scripts": "file:packages/scripts",
 		"babel-plugin-inline-json-import": "0.3.2",
+		"babel-plugin-syntax-async-functions": "6.13.0",
 		"benchmark": "2.1.4",
 		"browserslist": "4.4.1",
 		"chalk": "2.4.1",
@@ -107,6 +112,7 @@
 		"node-watch": "0.6.0",
 		"parcel-bundler": "1.12.3",
 		"pegjs": "0.10.0",
+		"performancemeter": "3.0.0",
 		"phpegjs": "1.0.0-beta7",
 		"postcss": "7.0.13",
 		"react": "16.8.4",

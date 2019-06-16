@@ -1,12 +1,12 @@
-version: '3.1'
+version: "3.1"
 
 services:
-
   wordpress:
     image: wordpress
     restart: always
     ports:
-      - 8888:80
+#     - 192.168.43.147:8888:80 # wifi phone
+      - 192.168.42.9:8888:80 # usb phone
     environment:
       WORDPRESS_DB_HOST: mysql
       WORDPRESS_DB_PASSWORD: example
@@ -38,7 +38,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: example
-      MYSQL_DATABASE: wordpress_test
+      MYSQL_DATABASE: wordpress
 
   wordpress_phpunit:
     image: chriszarate/wordpress-phpunit

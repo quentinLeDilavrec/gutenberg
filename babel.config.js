@@ -1,8 +1,12 @@
 module.exports = function( api ) {
-	api.cache( true );
+	api.cache( false );
 
 	return {
-		presets: [ '@wordpress/babel-preset-default' ],
+		passPerPreset: true,
+		presets: [
+			'./preset-instrument.js',
+			'@wordpress/babel-preset-default',
+		],
 		plugins: [ 'babel-plugin-inline-json-import' ],
 	};
 };
