@@ -27,6 +27,7 @@ module.exports = {
 		'/packages/e2e-tests',
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
+		'<rootDir>/.+\.native\.js$',
 	],
 	// globalSetup: '<rootDir>/packages/scripts/config/setup.js',
 	// globalTeardown: '<rootDir>/packages/scripts/config/teardown.js',

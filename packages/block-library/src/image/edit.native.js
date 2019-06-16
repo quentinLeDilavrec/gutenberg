@@ -15,6 +15,8 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import {
+	BottomSheet,
+	Icon,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
@@ -25,7 +27,6 @@ import {
 	RichText,
 	BlockControls,
 	InspectorControls,
-	BottomSheet,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -193,10 +194,10 @@ class ImageEdit extends React.Component {
 
 	getIcon( isRetryIcon ) {
 		if ( isRetryIcon ) {
-			return <SvgIconRetry fill={ styles.iconRetry.fill } />;
+			return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
 		}
 
-		return <SvgIcon fill={ styles.icon.fill } />;
+		return <Icon icon={ SvgIcon } { ...styles.icon } />;
 	}
 
 	render() {
@@ -211,22 +212,16 @@ class ImageEdit extends React.Component {
 			this.setState( { showSettings: false } );
 		};
 
-		const toolbarEditButton = (
-			<MediaUpload mediaType={ MEDIA_TYPE_IMAGE }
-				onSelectURL={ this.onSelectMediaUploadOption }
-				render={ ( { open, getMediaOptions } ) => {
-					return (
-						<Toolbar>
-							{ getMediaOptions() }
-							<ToolbarButton
-								title={ __( 'Edit image' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						</Toolbar>
-					);
-				} } >
-			</MediaUpload>
+		const getToolbarEditButton = ( open ) => (
+			<BlockControls>
+				<Toolbar>
+					<ToolbarButton
+						title={ __( 'Edit image' ) }
+						icon="edit"
+						onClick={ open }
+					/>
+				</Toolbar>
+			</BlockControls>
 		);
 
 		const getInspectorControls = () => (
@@ -276,27 +271,18 @@ class ImageEdit extends React.Component {
 		}
 
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
-
-		return (
+		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
-
-				accessibilityLabel={ sprintf(
-					/* translators: accessibility text. 1: image alt text. 2: image caption. */
-					__( 'Image block. %1$s. %2$s' ),
-					alt,
-					caption
-				) }
-				accessibilityRole={ 'button' }
 				onPress={ this.onImagePressed }
+				onLongPress={ openMediaOptions }
 				disabled={ ! isSelected }
 			>
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
+					{ getMediaOptions() }
 					{ ( ! this.state.isCaptionSelected ) &&
-						<BlockControls>
-							{ toolbarEditButton }
-						</BlockControls>
+						getToolbarEditButton( openMediaOptions )
 					}
 					<InspectorControls>
 						<ToolbarButton
@@ -326,16 +312,20 @@ class ImageEdit extends React.Component {
 
 							return (
 								<View style={ { flex: 1 } } >
-									{ ! imageWidthWithinContainer && <View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
-										{ this.getIcon( false ) }
-									</View> }
+									{ ! imageWidthWithinContainer &&
+										<View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
+											{ this.getIcon( false ) }
+										</View> }
 									<ImageBackground
+										accessible={ true }
+										disabled={ ! isSelected }
+										accessibilityLabel={ alt }
+										accessibilityHint={ __( 'Double tap and hold to edit' ) }
+										accessibilityRole={ 'imagebutton' }
 										style={ { width: finalWidth, height: finalHeight, opacity } }
 										resizeMethod="scale"
 										source={ { uri: url } }
 										key={ url }
-										accessible={ true }
-										accessibilityLabel={ alt }
 									>
 										{ isUploadFailed &&
 											<View style={ [ styles.imageContainer, { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' } ] } >
@@ -371,9 +361,10 @@ class ImageEdit extends React.Component {
 								placeholder={ __( 'Write caption…' ) }
 								value={ caption }
 								onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-								onFocus={ this.onFocusCaption }
+								unstableOnFocus={ this.onFocusCaption }
 								onBlur={ this.props.onBlur } // always assign onBlur as props
 								isSelected={ this.state.isCaptionSelected }
+								__unstableMobileNoFocusOnMount
 								fontSize={ 14 }
 								underlineColorAndroid="transparent"
 								textAlign={ 'center' }
@@ -382,6 +373,15 @@ class ImageEdit extends React.Component {
 					) }
 				</View>
 			</TouchableWithoutFeedback>
+		);
+
+		return (
+			<MediaUpload mediaType={ MEDIA_TYPE_IMAGE }
+				onSelectURL={ this.onSelectMediaUploadOption }
+				render={ ( { open, getMediaOptions } ) => {
+					return getImageComponent( open, getMediaOptions );
+				} }
+			/>
 		);
 	}
 }
