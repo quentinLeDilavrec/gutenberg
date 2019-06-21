@@ -1,0 +1,306 @@
+/**
+ * External dependencies
+ */
+// import * as eslint from 'eslint';
+// import * as estree from 'estree';
+// const fs = require( 'fs' );
+// const path = require( 'path' );
+
+const fX = 'invalid.js:program.body[0].declarations[0].init';
+const fY = 'invalid.js:program.body[1].declarations[0].init';
+const fZ = 'invalid.js:program.body[2].declarations[0].init';
+
+const database = [ [ fX, fY, fZ ], [ fY, fZ, fX ], [ fZ, fX, fY ] ];
+
+// (async () => {
+//   const {fd, path, cleanup} = await file();
+//   // work with file here in fd
+//   cleanup();
+// })();
+
+const util = require( 'util' );
+const exec = util.promisify( require( 'child_process' ).exec );
+
+class CallsStatics {
+	constructor( tmpFilePath, pattern, keyPattern ) {
+		this.tmpFilePath = tmpFilePath;
+		this.pattern = pattern;
+		this.keyPattern = keyPattern;
+	}
+	instanciateMap() {
+		let cmd = 'test -f ' + this.tmpFilePath;
+		if ( this.keyFile !== undefined ) {
+			cmd += ' || grep -Fxf <(cat ' + this.keyPattern + ' | sort | uniq) <(cat ' + this.pattern + ' | sort) | uniq -c > ' + this.tmpFilePath;
+		} else {
+			cmd += ' || cat ' + this.pattern + ' | sort | uniq -c > ' + this.tmpFilePath;
+		}
+		return exec( cmd );
+	}
+	async getNumberOfCallsRaw( key ) {
+		// eslint-disable-next-line no-console
+		await ( this.computationPromise = this.computationPromise || this.instanciateMap() ).then( console.log );
+		// eslint-disable-next-line no-console
+		const cmd = "grep '^[ ]*[^ ]* " + key + "' " + this.tmpFilePath;
+		const { stdout, stderr } = await exec( cmd + ' || echo' );
+		// eslint-disable-next-line no-console
+		console.log( 5, stderr, stdout );
+		return stdout.trim();
+	}
+	/**
+	 * get the number of calls made to function depending on parameters
+	 * @param {string} key is the identifier pattern of the call, for example:
+	 * - gutenberg/packages/viewport/src/with-viewport-match.js
+	 * give all call comming from functions declared in with-viewport-match.js
+	 * - gutenberg/packages/viewport/src/
+	 * give all call comming from functions declared in src/.
+	 * - gutenberg/packages/viewport/src/with-viewport-match.js:36:13:40:2
+	 * give the call comming from the function starting at line 36 column 13
+	 * and ending at line 40 column 2.
+	 */
+	async getPromiseNumberOfCalls( key ) {
+		function reviver( s ) {
+			if ( s === '[Object]' ) {
+				return {};
+			}
+			const match = s.match( /\[Array\((.*)\)\]/ );
+			if ( match ) {
+				return new Array( parseInt( match[ 0 ], 10 ) );
+			}
+			return s;
+		}
+		function formatCall( x ) {
+			return {
+				count: x.substr( 0, x.indexOf( ' ' ) ),
+				param: JSON.parse( x.substr( x.indexOf( ' ', 2 ) + 1 ), reviver ),
+			};
+		}
+		const raw = await this.getNumberOfCallsRaw( key );
+		const res = raw === '' ? [] : raw.split( '\n' )
+			.map( ( x ) => formatCall( x.trim() ) );
+		return res;
+	}
+	getNumberOfCalls( key, context, node ) {
+		testsCallsTmp.getPromiseNumberOfCalls( key )
+			.then( ( x ) => {
+				if ( x.length > 0 ) {
+					context.report( {
+						node,
+						message: 'JSON.stringify( x )',
+					} );
+				}
+			} );
+	}
+}
+
+const productionCallsTmp = new CallsStatics(
+	'/home/quentin/js_intercept_data/tmp/productionCalls.tmp',
+	'/home/quentin/js_intercept_data/browser/v2/0.5109343098444679' );
+const testsCallsTmp = new CallsStatics(
+	'/home/quentin/js_intercept_data/tmp/testsCalls.tmp',
+	'/home/quentin/js_intercept_data/unit/v2/*' );
+
+function getLocation( node, srcName ) {
+	return ( node.loc.source || srcName ).split( '/' ).slice( 3 ).join( '/' ) + ':' + node.loc.start.line + ':' + node.loc.start.column + ':' + node.loc.end.line + ':' + node.loc.end.column;
+}
+function getPathLocation( node ) {
+	const parts = [];
+	let path = node.parent;
+	do {
+		// eslint-disable-next-line no-console
+		// console.log( 666, parts, path.type, Object.keys( path ) );
+		if ( path.type === 'WhileStatement' || path.type === 'DoWhileStatement' ) {
+			if ( path.test === node ) {
+				parts.unshift( 'test' );
+			} else if ( path.body === node ) {
+				parts.unshift( 'body' );
+			} else {
+				parts.unshift( 'undefined_' + ( path.type ) );
+			}
+		} else if ( path.type === 'ForStatement' ) {
+			if ( path.body === node ) {
+				parts.unshift( 'body' );
+			} else if ( path.update === node ) {
+				parts.unshift( 'update' );
+			} else if ( path.test === node ) {
+				parts.unshift( 'test' );
+			} else if ( path.init === node ) {
+				parts.unshift( 'init' );
+			} else {
+				parts.unshift( 'undefined_' + ( path.type ) );
+			}
+		} else if ( path.type === 'ForInStatement' ) {
+			if ( path.body === node ) {
+				parts.unshift( 'body' );
+			} else if ( path.left === node ) {
+				parts.unshift( 'left' );
+			} else if ( path.right === node ) {
+				parts.unshift( 'right' );
+			} else {
+				parts.unshift( 'undefined_' + ( path.type ) );
+			}
+		} else if ( path.type === 'TryStatement' ) {
+			if ( path.block === node ) {
+				parts.unshift( 'block' );
+			} else if ( path.handler === node ) {
+				parts.unshift( 'handler' );
+			} else if ( path.finalizer === node ) {
+				parts.unshift( 'finalizer' );
+			} else {
+				parts.unshift( 'undefined_' + ( path.type ) );
+			}
+		} else if ( path.type === 'SwitchCase' ) {
+			const key = path.consequent.findIndex( ( x ) => x === node );
+			if ( key === -1 ) {
+				parts.unshift( 'undefined_' + ( path.type ) );
+			}
+			parts.unshift( 'consequent[' + key + ']' );
+		} else if ( path.declarations !== undefined ) {
+			const key = path.declarations.findIndex( ( x ) => x === node );
+			if ( key === -1 ) {
+				parts.unshift( 'undefined_' + ( path.type ) );
+			}
+			parts.unshift( 'declarations[' + key + ']' );
+		} else if ( path.declaration !== undefined ) { // TODO verify it (not in ESTree)
+			parts.unshift( 'declaration' );
+		} else if ( path.expression !== undefined ) {
+			parts.unshift( 'expression' );
+		} else if ( path.right !== undefined && path.right === node ) {
+			parts.unshift( 'right' );
+		} else if ( path.left !== undefined && path.left === node ) {
+			parts.unshift( 'left' );
+		} else if ( path.callee !== undefined && path.callee === node ) {
+			parts.unshift( 'callee' );
+		} else if ( path.argument !== undefined && path.argument === node ) {
+			parts.unshift( 'argument' );
+		} else if ( path.arguments !== undefined ) {
+			const key = path.arguments.findIndex( ( x ) => x === node );
+			if ( key === -1 ) {
+				parts.unshift( 'undefined_' + ( path.type ) );
+			}
+			parts.unshift( 'arguments[' + key + ']' );
+		} else if ( path.properties !== undefined ) {
+			const key = path.properties.findIndex( ( x ) => x === node );
+			if ( key === -1 ) {
+				parts.unshift( 'undefined_' + ( path.type ) );
+			}
+			parts.unshift( 'properties[' + key + ']' );
+		} else if ( path.value !== undefined ) {
+			parts.unshift( 'value' );
+		} else if ( path.elements !== undefined ) {
+			const key = path.elements.findIndex( ( x ) => x === node );
+			if ( key === -1 ) {
+				parts.unshift( 'undefined_' + ( path.type ) );
+			}
+			parts.unshift( 'elements[' + key + ']' );
+		} else if ( path.body !== undefined ) {
+			if ( path.body.findIndex === undefined ) {
+				parts.unshift( 'body' );
+			} else {
+				const key = path.body.findIndex( ( x ) => x === node );
+				if ( key === -1 ) {
+					parts.unshift( 'undefined_' + ( path.type ) );
+				}
+				parts.unshift( 'body[' + key + ']' );
+			}
+		} else if ( path.cases !== undefined ) {
+			const key = path.cases.findIndex( ( x ) => x === node );
+			if ( key === -1 ) {
+				parts.unshift( 'undefined_' + ( path.type ) );
+			}
+			parts.unshift( 'cases[' + key + ']' );
+		} else if ( path.consequent !== undefined ) {
+			if ( path.consequent === node ) {
+				parts.unshift( 'consequent' );
+			} else {
+				parts.unshift( 'alternate' );
+			}
+		} else if ( path.attributes !== undefined ) {
+			parts.unshift( 'attributes' );
+		} else if ( path.openingElement !== undefined && path.openingElement === node ) {
+			parts.unshift( 'openingElement' );
+		} else if ( path.closingElement !== undefined && path.closingElement === node ) {
+			parts.unshift( 'closingElement' );
+		} else if ( path.children !== undefined ) {
+			const key = path.children.findIndex( ( x ) => x === node );
+			if ( key === -1 ) {
+				parts.unshift( 'undefined_' + ( path.type ) );
+			}
+			parts.unshift( 'children[' + key + ']' );
+		} else if ( path.init !== undefined ) {
+			parts.unshift( 'init' );
+		} else {
+			parts.unshift( 'dont_handle_' + ( path.type ) );
+		}
+		node = path;
+		path = node.parent;
+	} while ( path );
+	parts.unshift( 'program' );
+	return parts.join( '.' );
+}
+
+module.exports = {
+	meta: {
+		type: 'suggestion',
+		docs: {
+			description: 'Suggest new tests for functions',
+			url:
+				'https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/behaviour-analysis.md',
+		},
+		schema: [],
+		fixable: true,
+	},
+	/**
+	 *
+	 * @param {eslint.Rule.RuleContext} context
+	 * @return {eslint.Rule.RuleListener} value
+	 */
+	create( context ) {
+		return {
+			FunctionDeclaration( node ) {
+				const id = getLocation( node, context.getFilename() );
+				const id2 = getPathLocation( node );
+				productionCallsTmp.getNumberOfCalls( id, context, node );
+				testsCallsTmp.getNumberOfCalls( id, context, node );
+				// eslint-disable-next-line no-console
+				console.log( 666, '/home/quentin/' + id, id2 );
+				const index = database.findIndex( ( x ) => x.findIndex( ( y ) => y === id ) > -1 );
+				if ( index > -1 ) {
+					context.report( {
+						node,
+						message: `tests of ${ node.id.name } did not cover the case ${ database[ index ] }`,
+					} );
+				}
+			},
+			FunctionExpression( node ) {
+				const id = getLocation( node, context.getFilename() );
+				const id2 = getPathLocation( node );
+				productionCallsTmp.getNumberOfCalls( id, context, node );
+				testsCallsTmp.getNumberOfCalls( id, context, node );
+				// eslint-disable-next-line no-console
+				console.log( 666, '/home/quentin/' + id, id2 );
+				const index = database.findIndex( ( x ) => x.findIndex( ( y ) => y === id ) > -1 );
+				if ( index > -1 ) {
+					context.report( {
+						node,
+						message: `tests of ${ node.id.name } did not cover the case ${ database[ index ] }`,
+					} );
+				}
+			},
+			ArrowFunctionExpression( node ) { // TODO is it usefull?
+				const id = getLocation( node, context.getFilename() );
+				const id2 = getPathLocation( node );
+				productionCallsTmp.getNumberOfCalls( id, context, node );
+				testsCallsTmp.getNumberOfCalls( id, context, node );
+				// eslint-disable-next-line no-console
+				console.log( 666, '/home/quentin/' + id, id2 );
+				const index = database.findIndex( ( x ) => x.findIndex( ( y ) => y === id ) > -1 );
+				if ( index > -1 ) {
+					context.report( {
+						node,
+						message: `tests of ${ node.id.name } did not cover the case ${ database[ index ] }`,
+					} );
+				}
+			},
+		};
+	},
+};

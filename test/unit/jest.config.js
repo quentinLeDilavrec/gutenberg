@@ -14,12 +14,8 @@ module.exports = {
 	},
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [
-		// '<rootDir>/packages/scripts/config/global1-setup.js',
 		'<rootDir>/test/unit/config/gutenberg-phase.js',
 	],
-	// setupFilesAfterEnv: [
-	// 	'<rootDir>/packages/scripts/config/global-setup.js',
-	// ],
 	testURL: 'http://localhost',
 	testPathIgnorePatterns: [
 		'/\.git/',
@@ -29,14 +25,5 @@ module.exports = {
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.+\.native\.js$',
 	],
-	// globalSetup: '<rootDir>/setup.js',
-	// globalTeardown: '<rootDir>/teardown.js',
 	testEnvironment: '<rootDir>/behavior_environment.js',
-	// transform: {
-	// 	'^.+/packages/.+\\.[jt]sx?$': '/home/quentin/gutenberg/packages/scripts/config/babel-transform.js',
-	// },
-	// globals: {
-	// 	window: false,
-	// },
-	// reporters: [ 'default', '<rootDir>/behavior-reporter.js' ],
 };

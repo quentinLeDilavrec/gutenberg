@@ -1,0 +1,68 @@
+/**
+ * External dependencies
+ */
+import { RuleTester } from 'eslint';
+
+/**
+ * Internal dependencies
+ */
+import rule from '../behaviour-analysis';
+
+const ruleTester = new RuleTester( {
+	parserOptions: {
+		sourceType: 'module',
+		ecmaVersion: 6,
+	},
+} );
+
+ruleTester.run( 'underline functions not tested', rule, {
+	valid: [
+		{
+			filename: 'valid.js',
+			code: `
+function a(){}
+let bb = function b(){}
+do {
+	function x() {} + function z() {};
+	let y = function y() {}
+} while(1);`,
+		},
+		{
+			code: `
+let e = { ccc() {} }`,
+		},
+		{
+			code: `
+class A { constructor() {}}`,
+		},
+		{
+			code: `
+export default compose( [
+	withBlockEditContext( ( { name } ) => {
+		return {
+			blockName: name,
+		};
+	} ),
+	withFilteredAutocompleters,
+] )( OriginalAutocomplete );`,
+		},
+	],
+	invalid: [
+		{
+			filename: 'invalid.js',
+			code: `
+let xx = function x(){}
+let yy = function y(){}
+let zz = function z(){}`,
+			errors: [
+				{ message: 'tests of x did not cover the case invalid.js.program.body[0].declarations[0].init,invalid.js.program.body[1].declarations[0].init,invalid.js.program.body[2].declarations[0].init' },
+				{ message: 'tests of y did not cover the case invalid.js.program.body[0].declarations[0].init,invalid.js.program.body[1].declarations[0].init,invalid.js.program.body[2].declarations[0].init' },
+				{ message: 'tests of z did not cover the case invalid.js.program.body[0].declarations[0].init,invalid.js.program.body[1].declarations[0].init,invalid.js.program.body[2].declarations[0].init' },
+			],
+			output: `
+let xx = function x(){}
+let yy = function y(){}
+let zz = function z(){}`,
+		},
+	],
+} );
