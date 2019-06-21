@@ -29,13 +29,14 @@ module.exports = {
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.+\.native\.js$',
 	],
-	// globalSetup: '<rootDir>/packages/scripts/config/setup.js',
-	// globalTeardown: '<rootDir>/packages/scripts/config/teardown.js',
-	testEnvironment: '<rootDir>/packages/scripts/config/behavior_environment.js',
+	// globalSetup: '<rootDir>/setup.js',
+	// globalTeardown: '<rootDir>/teardown.js',
+	testEnvironment: '<rootDir>/behavior_environment.js',
 	// transform: {
 	// 	'^.+/packages/.+\\.[jt]sx?$': '/home/quentin/gutenberg/packages/scripts/config/babel-transform.js',
 	// },
 	// globals: {
 	// 	window: false,
 	// },
+	// reporters: [ 'default', '<rootDir>/behavior-reporter.js' ],
 };

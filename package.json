@@ -62,9 +62,7 @@
 		"@wordpress/token-list": "file:packages/token-list",
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
-		"@wordpress/wordcount": "file:packages/wordcount",
-		"ajv": "6.10.0",
-		"puppeteer": "1.17.0"
+		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
 		"@babel/core": "7.4.4",
@@ -82,7 +80,6 @@
 		"@wordpress/e2e-test-utils": "file:packages/e2e-test-utils",
 		"@wordpress/e2e-tests": "file:packages/e2e-tests",
 		"@wordpress/eslint-plugin": "file:packages/eslint-plugin",
-		"@wordpress/eslint-plugin-instrument": "file:packages/eslint-plugin-instrument",
 		"@wordpress/jest-console": "file:packages/jest-console",
 		"@wordpress/jest-preset-default": "file:packages/jest-preset-default",
 		"@wordpress/jest-puppeteer-axe": "file:packages/jest-puppeteer-axe",
@@ -123,7 +120,6 @@
 		"node-watch": "0.6.0",
 		"parcel-bundler": "1.12.3",
 		"pegjs": "0.10.0",
-		"performancemeter": "3.0.0",
 		"phpegjs": "1.0.0-beta7",
 		"postcss": "7.0.13",
 		"progress": "2.0.3",

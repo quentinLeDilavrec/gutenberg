@@ -5,7 +5,8 @@ services:
     image: wordpress
     restart: always
     ports:
-#     - 192.168.43.147:8888:80 # wifi phone
+      #     - 192.168.43.147:8888:80 # wifi phone
+      # - localhost:8888:82
       - 192.168.42.9:8888:80 # usb phone
     environment:
       WORDPRESS_DB_HOST: mysql
