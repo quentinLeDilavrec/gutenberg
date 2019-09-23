@@ -159,7 +159,7 @@ function mapSelectors( selectors, store, registry ) {
 			registeredSelector( registry.select ) :
 			registeredSelector;
 
-		const selector = function runSelector() {
+		const selector = function runSelector() { // CURR2
 			// This function is an optimized implementation of:
 			//
 			//   selector( store.getState(), ...arguments )

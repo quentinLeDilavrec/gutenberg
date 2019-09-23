@@ -71,7 +71,7 @@ Compiler.prototype.import = function( node ) {
  * Visit media node.
  */
 
-Compiler.prototype.media = function( node ) {
+Compiler.prototype.media = function( node ) { // TOSEE
 	return (
 		this.emit( '@media ' + node.media, node.position ) +
 		this.emit(

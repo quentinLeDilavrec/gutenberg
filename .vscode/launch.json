@@ -1,0 +1,33 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Debug Jest Tests",
+			"type": "node",
+			"request": "launch",
+			"runtimeArgs": [
+				"--inspect-brk",
+				"${workspaceRoot}/packages/scripts/bin/wp-scripts.js",
+				"test-unit-js",
+				"--config",
+				"test/unit/jest.config.js",
+				"--runInBand"
+			],
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"port": 9229
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Debug babel",
+			"console": "integratedTerminal",
+			"autoAttachChildProcesses": true,
+			"program": "${workspaceFolder}/node_modules/@babel/cli/bin/babel.js",
+			"args": [
+				"--config-file=${workspaceFolder}/babel.config.js",
+				"${workspaceFolder}/path/to/file.js"
+			]
+		}
+	]
+}

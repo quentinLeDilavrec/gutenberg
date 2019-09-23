@@ -689,7 +689,7 @@ export function didPostSaveRequestFail( state ) {
  *
  * @return {boolean} Whether the post is autosaving.
  */
-export function isAutosavingPost( state ) {
+export function isAutosavingPost( state ) { // TOSEE dyn analysis interesting but too much branches
 	return isSavingPost( state ) && !! state.saving.options.isAutosave;
 }
 
@@ -1049,7 +1049,7 @@ export function inSomeHistory( state, predicate ) {
  *
  * @return {boolean} Is locked.
  */
-export function isPostLocked( state ) {
+export function isPostLocked( state ) { // TOSEE dyn analysis interesting but only used by a deprecated function
 	return state.postLock.isLocked;
 }
 
@@ -1071,7 +1071,7 @@ export function isPostSavingLocked( state ) {
  *
  * @return {boolean} Is post lock takeover.
  */
-export function isPostLockTakeover( state ) {
+export function isPostLockTakeover( state ) { // TOSEE dyn analysis interesting but only used by a deprecated function CURR0 // COOL
 	return state.postLock.isTakeover;
 }
 
@@ -1082,7 +1082,7 @@ export function isPostLockTakeover( state ) {
  *
  * @return {Object} A user object.
  */
-export function getPostLockUser( state ) {
+export function getPostLockUser( state ) { // TOSEE dyn analysis interesting but only used by a deprecated function
 	return state.postLock.user;
 }
 

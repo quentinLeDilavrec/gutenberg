@@ -30,7 +30,7 @@ export { Provider as BlockEditContextProvider };
  * @return {Component} Enhanced component with injected context as props.
  */
 export const withBlockEditContext = ( mapContextToProps ) => createHigherOrderComponent( ( OriginalComponent ) => {
-	return ( props ) => (
+	return ( props ) => ( // TOSEE
 		<Consumer>
 			{ ( context ) => (
 				<OriginalComponent

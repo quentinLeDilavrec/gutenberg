@@ -147,7 +147,7 @@ function getCaretRect() {
 }
 
 export class Autocomplete extends Component {
-	static getInitialState() {
+	static getInitialState() { // TO SEE
 		return {
 			search: /./,
 			selectedIndex: 0,
@@ -214,7 +214,7 @@ export class Autocomplete extends Component {
 		this.reset();
 	}
 
-	reset() {
+	reset() { // TOSEE
 		const isMounted = !! this.node;
 
 		// Autocompletions may replace the block containing this component,
@@ -362,7 +362,7 @@ export class Autocomplete extends Component {
 		event.stopPropagation();
 	}
 
-	toggleKeyEvents( isListening ) {
+	toggleKeyEvents( isListening ) { // TOSEE
 		// This exists because we must capture ENTER key presses before RichText.
 		// It seems that react fires the simulated capturing events after the
 		// native browser event has already bubbled so we can't stopPropagation
@@ -372,7 +372,7 @@ export class Autocomplete extends Component {
 		this.node[ handler ]( 'keydown', this.handleKeyDown, true );
 	}
 
-	componentDidUpdate( prevProps, prevState ) {
+	componentDidUpdate( prevProps, prevState ) { // TOSEE
 		const { record, completers } = this.props;
 		const { record: prevRecord } = prevProps;
 		const { open: prevOpen } = prevState;
@@ -388,7 +388,7 @@ export class Autocomplete extends Component {
 			if ( text !== prevText ) {
 				const textAfterSelection = getTextContent( slice( record, undefined, getTextContent( record ).length ) );
 				const allCompleters = map( completers, ( completer, idx ) => ( { ...completer, idx } ) );
-				const open = find( allCompleters, ( { triggerPrefix, allowContext } ) => {
+				const open = find( allCompleters, ( { triggerPrefix, allowContext } ) => { // TOSEE
 					const index = text.lastIndexOf( triggerPrefix );
 
 					if ( index === -1 ) {
@@ -442,7 +442,7 @@ export class Autocomplete extends Component {
 		this.debouncedLoadOptions.cancel();
 	}
 
-	render() {
+	render() { // TOSEE
 		const { children, instanceId } = this.props;
 		const { open, suppress, selectedIndex, filteredOptions } = this.state;
 		const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};

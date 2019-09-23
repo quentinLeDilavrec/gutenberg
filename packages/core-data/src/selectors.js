@@ -258,6 +258,6 @@ export function getAutosave( state, postType, postId, authorId ) {
  *
  * @return {boolean} True if the REST request was completed. False otherwise.
  */
-export const hasFetchedAutosaves = createRegistrySelector( ( select ) => ( state, postType, postId ) => {
+export const hasFetchedAutosaves = createRegistrySelector( ( select ) => ( state, postType, postId ) => { // TOSEE
 	return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [ postType, postId ] );
 } );

@@ -25,5 +25,8 @@ module.exports = {
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.+\.native\.js$',
 	],
-	testEnvironment: '<rootDir>/behavior_environment.js',
+	testEnvironment: '<rootDir>/node_modules/behavior-code-processing/out/environment.js',
+	testEnvironmentOptions: {
+		output_dir: '/tmp/behavior_traces/unittest/', // NOTE directory where traces will be saved
+	},
 };

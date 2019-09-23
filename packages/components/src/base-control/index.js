@@ -16,7 +16,7 @@ function BaseControl( { id, label, help, className, children } ) {
 	);
 }
 
-BaseControl.VisualLabel = ( { className, children } ) => {
+BaseControl.VisualLabel = ( { className, children } ) => { // TOSEE
 	className = classnames( 'components-base-control__label', className );
 	return (
 		<span className={ className }>

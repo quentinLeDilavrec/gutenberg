@@ -1,9 +1,15 @@
-function getLocation( node, srcName ) {
-	const loc = node.loc;
-	return srcName.split( '/' ).slice( 3 ).join( '/' ) + ':' + loc.start.line + ':' + loc.start.column + ':' + loc.end.line + ':' + loc.end.column;
-}
 
+function getLocation( node, srcName ) { // TODO check if it is portable
+	const loc = node.loc; // TODO look at this.file.opts.filename if it works
+	// throw new Error( srcName );
+	if ( loc ) {
+		return ( ( srcName[ 0 ] !== '/' ) ? srcName : srcName.split( '/' ).slice( 3 ).join( '/' ) ) + ':' + loc.start.line + ':' + loc.start.column + ':' + loc.end.line + ':' + loc.end.column;
+	}
+	return ( ( srcName[ 0 ] !== '/' ) ? srcName : srcName.split( '/' ).slice( 3 ).join( '/' ) );
+}
 function transformerContainer( URL ) {
+	const fs = require( 'fs' );
+
 	return function( Babel ) {
 		const btypes = Babel.types;
 		function param2exp( param ) {
@@ -35,6 +41,7 @@ function transformerContainer( URL ) {
 			// path, fnVal,
 			// btypes.stringLiteral( path ),
 			// fnVal,
+			fs.appendFileSync( 'functions.txt', ( currFile || URL ) + '\n' );
 			return btypes.expressionStatement(
 				btypes.callExpression( btypes.identifier( pusherExpr ), [
 					btypes.arrayExpression( [

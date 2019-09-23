@@ -88,7 +88,7 @@ const globalStyle = document.createElement( 'style' );
 
 document.head.appendChild( globalStyle );
 
-function createPrepareEditableTree( props, prefix ) {
+function createPrepareEditableTree( props, prefix ) { // TOSEE
 	const fns = Object.keys( props ).reduce( ( accumulator, key ) => {
 		if ( key.startsWith( prefix ) ) {
 			accumulator.push( props[ key ] );
@@ -184,7 +184,7 @@ export class RichText extends Component {
 		return this.record;
 	}
 
-	createRecord() {
+	createRecord() { // TOSEE
 		const selection = getSelection();
 		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
 
@@ -390,7 +390,7 @@ export class RichText extends Component {
 	 *
 	 * @param {SyntheticEvent} event Synthetic input event.
 	 */
-	onInput( event ) {
+	onInput( event ) { // TOSEE
 		// For Input Method Editor (IME), used in Chinese, Japanese, and Korean
 		// (CJK), do not trigger a change if characters are being composed.
 		// Browsers setting `isComposing` to `true` will usually emit a final
@@ -520,7 +520,7 @@ export class RichText extends Component {
 	 * @param {boolean} $2.withoutHistory If true, no undo level will be
 	 *                                    created.
 	 */
-	onChange( record, { withoutHistory } = {} ) {
+	onChange( record, { withoutHistory } = {} ) { // TOSEE
 		this.applyRecord( record );
 
 		const { start, end, activeFormats = [] } = record;
@@ -608,7 +608,7 @@ export class RichText extends Component {
 	 *
 	 * @param {SyntheticEvent} event A synthetic keyboard event.
 	 */
-	onKeyDown( event ) {
+	onKeyDown( event ) { // TOSEE 4 non tested sequence
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 		const { onReplace, onSplit } = this.props;
 		const canSplit = onReplace && onSplit;
@@ -1008,7 +1008,7 @@ export class RichText extends Component {
 		return value;
 	}
 
-	render() {
+	render() { // TOSEE dyn analysis
 		const {
 			tagName: Tagname = 'div',
 			style,

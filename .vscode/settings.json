@@ -1,0 +1,16 @@
+{
+	"editor.formatOnSave": true,
+	"[javascript]": {
+		"editor.formatOnSave": false
+	},
+	"eslint.autoFixOnSave": true,
+	"eslint.alwaysShowStatus": true,
+	"files.autoSave": "onFocusChange",
+	// "editor.formatOnPaste": true,
+	"editor.fontLigatures": true,
+	// "prettier.printWidth": 120,
+	// "prettier.tabWidth": 4,
+	"prettier.eslintIntegration": true,
+	"behaviorAnalysis.extendedBabelPlugin": "example_behavior_plugin_made_by_user",
+	"behaviorAnalysis.experimentation.startPage": "http://localhost:8080/index.html"
+}

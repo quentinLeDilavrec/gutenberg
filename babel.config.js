@@ -8,5 +8,6 @@ module.exports = function( api ) {
 			'@wordpress/babel-preset-default',
 		],
 		plugins: [ 'babel-plugin-inline-json-import' ],
+		startLine: 0,
 	};
 };

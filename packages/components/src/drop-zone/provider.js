@@ -221,7 +221,7 @@ class DropZoneProvider extends Component {
 		event.preventDefault();
 	}
 
-	render() {
+	render() { // TOSEE
 		return (
 			<div onDrop={ this.onDrop } className="components-drop-zone__provider">
 				<Provider value={ this.dropZoneCallbacks }>

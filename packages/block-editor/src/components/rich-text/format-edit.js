@@ -7,7 +7,7 @@ import { getActiveFormat, getActiveObject } from '@wordpress/rich-text';
 const FormatEdit = ( { formatTypes, onChange, value } ) => {
 	return (
 		<>
-			{ formatTypes.map( ( { name, edit: Edit } ) => {
+			{ formatTypes.map( ( { name, edit: Edit } ) => { // TOSEE
 				if ( ! Edit ) {
 					return null;
 				}
